@@ -130,17 +130,19 @@ const allResultHeaders = [
 ];
 
 const searchFirstHeaders = [
-  "Số thuê bao", "Nhân viên tiếp nhận", "Đối tác", "Khu vực",
-  "Dịch vụ", "Không đồng ý", "Điểm Hài Lòng",
-  "Nguyên nhân không hài lòng", "Emotion", "Queue IPCC", "KI", "Tháng chấm KI",
-  "Điểm chất lượng", "Thâm niên", "Cấp 1", "Cấp 2", "Cấp 3", "Cấp 4",
+  "Số thuê bao", "Phân khúc khách hàng", "Loại hình thuê bao", "Loại dịch vụ", "Gói cước",
   "Thời gian đàm thoại của KH (s)",
+  "Nhân viên tiếp nhận", "Đối tác", "Khu vực",
+  "Dịch vụ", "Không đồng ý", "Điểm Hài Lòng",
+  "Nguyên nhân không hài lòng", "Emotion", "Nguyên nhân", "Chi tiết nhận diện",
+  "Queue IPCC", "KI", "Tháng chấm KI", "Điểm chất lượng", "Thâm niên", "Kênh",
+  "Cấp 1", "Cấp 2", "Cấp 3", "Cấp 4",
 ];
 
 const controlHeaders = [
   "Vi phạm nghiệp vụ", "Vi phạm ATTT", "Vi phạm ý thức/ Trách nhiệm",
   "Kết quả đánh giá chung", "Nhân viên kiểm soát", "Trạng thái kiểm soát",
-  "Kết quả kiểm soát", "Trạng thái giải trình", "Người giải trình",
+  "Kết quả kiểm soát", "Người giải trình", "Trạng thái giải trình",
 ];
 
 const viewActionColumn = "__view_action__";
@@ -155,11 +157,10 @@ const hiddenResultHeaders = new Set([
   "Nhu cầu Cấp 3", "Nhu cầu Cấp 4", "Nhóm phản ánh", "Thể loại",
   "Loại phản ánh", "Hình thức tiếp nhận", "Tỉnh (mới)", "Phường/xã (mới)",
   "Ngày xử lý cuối", "Người xử lý cuối", "Nội dung phản ánh", "Nội dung xử lý",
-  "Phòng xử lý", "Ngày nhắn tin khảo sát", "Ngày KH phản hồi", "Số lần liên lạc",
-  "Số lần lặp lại", "Thời gian kết nối", "Khoảng thời gian lặp lại (ngày)",
-  "Ki tháng n-1", "Kênh", "File ghi âm cuộc gọi", "Speed to text",
-  "Số lần liên lạc IPCC", "Số lần transfer", "Cảm xúc Emotion", "Nguyên nhân",
-  "Chi tiết nhận diện", "Nội dung vi phạm", "Chi tiết vi phạm", "Nội dung giải trình",
+  "Phòng xử lý", "Ngày nhắn tin khảo sát", "Ngày KH phản hồi",
+  "Thời gian kết nối", "Ki tháng n-1", "File ghi âm cuộc gọi", "Speed to text",
+  "Số lần liên lạc IPCC", "Số lần transfer", "Cảm xúc Emotion",
+  "Nội dung vi phạm", "Chi tiết vi phạm", "Nội dung giải trình",
   "Đề xuất chốt lỗi", "Nhận xét sau giải trình", "Kết quả đánh giá BO",
   "Chốt lỗi vi phạm", "Hành động/ Đề xuất", "Nhân viên đánh giá", "Thời gian đánh giá",
   "Chuyển Giải Trình", "Chi Tiết",
@@ -167,9 +168,10 @@ const hiddenResultHeaders = new Set([
 
 const resultHeaders = [
   "STT",
+  "Thời gian tiếp nhận",
   ...searchFirstHeaders.filter((header) => !hiddenResultHeaders.has(header)),
   ...allResultHeaders.filter((header) => header !== "STT" && header !== "Line tiếp nhận" && header !== "Ngày tiếp nhận" && header !== "Giờ tiếp nhận" && header !== "Ngày phân việc" && header !== "Hành động" && !hiddenResultHeaders.has(header) && !searchFirstHeaders.includes(header) && !controlHeaders.includes(header)),
-  "Line tiếp nhận",
+  "Line tiếp nhận", "Số lần liên lạc", "Số lần lặp lại", "Khoảng thời gian lặp lại (ngày)",
   ...controlHeaders,
   "Ngày phân việc",
   viewActionColumn,
@@ -217,6 +219,7 @@ const sampleValues = {
 };
 
 function getResultValue(header, row) {
+  if (header === "Thời gian tiếp nhận") return "08/03/2025 20:00";
   const originalIndex = allResultHeaders.indexOf(header);
   const value = originalIndex > 0 ? row[originalIndex - 1] : "";
   return value || sampleValues[header] || "Dữ liệu mẫu";
