@@ -5,17 +5,21 @@ import {
   ChevronUp,
   ChevronsLeft,
   ChevronsRight,
+  Download,
   Eye,
   Globe2,
   Maximize2,
+  Plus,
   Search,
   Settings,
   Smile,
   Trash2,
   UserRound,
+  Users,
   X,
 } from "lucide-react";
 import FilterField from "./components/FilterField";
+import Sidebar from "./components/Sidebar";
 
 const initialForm = {
   keyword: "",
@@ -65,7 +69,27 @@ const initialForm = {
 const options = {
   reportType: ["FO", "Callbotin", "Chatbot", "Telesale", "Trực tuyến"],
   region: ["Toàn Quốc", "Miền Bắc", "Miền Trung", "Miền Nam"],
-  service: ["Tất Cả", "FTTH", "TV360", "Di động"],
+  service: [
+    "Tất Cả",
+    "Di động",
+    "Cố định",
+    "SME",
+    "COC",
+    "18008000N2",
+    "18008000N3",
+    "18008000N4",
+    "18008000N5",
+    "18008000N7",
+    "18008000N8",
+    "18008000N9",
+    "1789N1",
+    "1789N2",
+    "1789N3-KĐG",
+    "1789N5",
+    "1789N6",
+    "18009000",
+    "VDS",
+  ],
   receiver: ["Tất Cả", "Nguyễn Văn A", "Trần Văn B"],
   partner: ["Tất Cả", "Đối tác A", "Đối tác B"],
   satisfaction: ["Không đồng ý", "Bình Thường", "Đồng Ý"],
@@ -85,16 +109,47 @@ const options = {
   senioritySort: ["Cao Nhất/ Thấp Nhất", "Thấp Nhất/ Cao Nhất"],
 };
 
-const resultRows = [
-  [
-    "1185007463", "961753668", "SMS", "Khách hàng VIP", "Thường",
-    "00008198", "callbot_10.208.70.9", "", "", "", "1", "38",
-    "04/05/2026 09:19:05", "", "", "", "", "", "", "", "",
-    "Công ty Dịch vụ Khách hàng", "VCX", "", "", "", "", "",
-    "20260504091851-JEUAEDJN-385498", "", "", "", "", "", "", "",
-    "", "", "", "", "", "",
-  ],
+const baseResultRow = [
+  "1185007463", "961753668", "SMS", "Khách hàng VIP", "Thường",
+  "00008198", "callbot_10.208.70.9", "", "", "", "1", "38",
+  "04/05/2026 09:19:05", "", "", "", "", "", "", "", "",
+  "Công ty Dịch vụ Khách hàng", "VCX", "", "", "", "", "",
+  "20260504091851-JEUAEDJN-385498", "", "", "", "", "", "", "",
+  "", "", "", "", "", "",
 ];
+
+const sampleServiceOptions = [
+  "Di động",
+  "Cố định",
+  "SME",
+  "COC",
+  "18008000N2",
+  "18008000N3",
+  "18008000N4",
+  "18008000N5",
+  "18008000N7",
+  "18008000N8",
+  "18008000N9",
+  "1789N1",
+  "1789N2",
+  "1789N3-KĐG",
+  "1789N5",
+  "1789N6",
+  "18009000",
+  "VDS",
+];
+
+const resultRows = Array.from({ length: 1000 }, (_, index) => {
+  const rowNumber = index + 1;
+  const row = [...baseResultRow];
+  const serviceValue = sampleServiceOptions[index % sampleServiceOptions.length];
+  row[0] = String(1185007463 + rowNumber);
+  row[1] = String(961753668 + rowNumber);
+  row[12] = `04/05/2026 09:${String(19 + index).padStart(2, "0")}:05`;
+  row[28] = `20260504091851-JEUAEDJN-${385498 + rowNumber}`;
+  row[30] = serviceValue;
+  return row;
+});
 
 const allResultHeaders = [
   "STT", "Mã cuộc survey", "Số thuê bao", "Hình thức survey",
@@ -218,6 +273,45 @@ const sampleValues = {
   "Line tiếp nhận": "00008198",
 };
 
+const controlStaffServiceOptions = {
+  main: ["Di động", "Cố định", "SME", "COC", "18008000N5", "18008000N8", "18008000N9", "1789N2", "1789N5", "18009000"],
+  sub: ["Di động", "18008000N2", "COC", "18008000N3", "18008000N4", "18008000N7", "Di động, VDS", "1789N1", "1789N3-KĐG", "1789N6", "VDS", "SME"],
+};
+
+const controlStaff = [
+  { username: "vt_dvkh_oahqtuyen463_cc2", fullName: "Lê Anh Tú", email: "lanttt@viettel.com.vn", mainUnit: "Di động", subUnit: "Di động", status: "Hoạt động" },
+  { username: "vt_cskh_okchong7118_ccdng", fullName: "Nguyễn Thị Hà", email: "chongnt@viettel.com.vn", mainUnit: "Cố định", subUnit: "18008000N2", status: "Hoạt động" },
+  { username: "vt_dvkh_ngocanh289_cc1", fullName: "Ngọc Anh", email: "ngocanhvt@viettel.com.vn", mainUnit: "SME", subUnit: "COC, 18008000N3", status: "Hoạt động" },
+  { username: "vt_cskh_minhquan527_cc2", fullName: "Minh Quân", email: "minhquan@viettel.com.vn", mainUnit: "COC", subUnit: "18008000N4", status: "Hoạt động" },
+  { username: "vt_dvkh_thuha304_cc1", fullName: "Thu Hà", email: "thuhatd@viettel.com.vn", mainUnit: "18008000N5", subUnit: "18008000N7", status: "Không hoạt động" },
+  { username: "vt_cskh_hoangnam816_cc3", fullName: "Hoàng Nam", email: "hoangnam@viettel.com.vn", mainUnit: "18008000N8", subUnit: "Di động, VDS", status: "Hoạt động" },
+  { username: "vt_dvkh_phuonglinh492_cc2", fullName: "Phương Linh", email: "phuonglinh@viettel.com.vn", mainUnit: "18008000N9", subUnit: "1789N1", status: "Hoạt động" },
+  { username: "vt_cskh_tuananh638_cc1", fullName: "Tuấn Anh", email: "tuananh@viettel.com.vn", mainUnit: "1789N2", subUnit: "1789N3-KĐG", status: "Hoạt động" },
+  { username: "vt_dvkh_khanhvy175_cc2", fullName: "Khánh Vy", email: "khanhvy@viettel.com.vn", mainUnit: "1789N5", subUnit: "1789N6", status: "Không hoạt động" },
+  { username: "vt_cskh_quanghuy903_cc3", fullName: "Quang Huy", email: "quanghuy@viettel.com.vn", mainUnit: "18009000", subUnit: "VDS, SME", status: "Hoạt động" },
+  { username: "vt_dvkh_hieuvu185_cc1", fullName: "Hiếu Vũ", email: "hieuvu@viettel.com.vn", mainUnit: "Di động", subUnit: "Di động", status: "Hoạt động" },
+  { username: "vt_cskh_thanhmai226_cc2", fullName: "Thành Mai", email: "thanhmai@viettel.com.vn", mainUnit: "Di động", subUnit: "Di động", status: "Hoạt động" },
+  { username: "vt_dvkh_quynhnhu541_cc3", fullName: "Quỳnh Như", email: "quynhnhu@viettel.com.vn", mainUnit: "Di động", subUnit: "Di động", status: "Hoạt động" },
+  { username: "vt_cskh_dangkhoa742_cc1", fullName: "Đăng Khoa", email: "dangkhoa@viettel.com.vn", mainUnit: "Cố định", subUnit: "18008000N2", status: "Hoạt động" },
+  { username: "vt_dvkh_hoangyen883_cc2", fullName: "Hoàng Yến", email: "hoangyen@viettel.com.vn", mainUnit: "Cố định", subUnit: "18008000N2", status: "Hoạt động" },
+  { username: "vt_cskh_tuanlinh913_cc3", fullName: "Tuấn Linh", email: "tuanlinh@viettel.com.vn", mainUnit: "SME", subUnit: "COC", status: "Hoạt động" },
+  { username: "vt_dvkh_minhthao471_cc1", fullName: "Minh Thảo", email: "minhthao@viettel.com.vn", mainUnit: "SME", subUnit: "18008000N3", status: "Hoạt động" },
+  { username: "vt_cskh_haianh386_cc2", fullName: "Hai Anh", email: "haianh@viettel.com.vn", mainUnit: "COC", subUnit: "18008000N4", status: "Hoạt động" },
+  { username: "vt_dvkh_trangloan604_cc3", fullName: "Trang Loan", email: "trangloan@viettel.com.vn", mainUnit: "COC", subUnit: "18008000N4", status: "Hoạt động" },
+  { username: "vt_cskh_namson728_cc1", fullName: "Nam Sơn", email: "namson@viettel.com.vn", mainUnit: "18008000N5", subUnit: "18008000N7", status: "Hoạt động" },
+  { username: "vt_dvkh_bichthu670_cc2", fullName: "Bích Thư", email: "bichthu@viettel.com.vn", mainUnit: "18008000N8", subUnit: "Di động, VDS", status: "Hoạt động" },
+  { username: "vt_cskh_kimchi751_cc3", fullName: "Kim Chi", email: "kimchi@viettel.com.vn", mainUnit: "18009000", subUnit: "VDS, SME", status: "Hoạt động" },
+  { username: "vt_dvkh_anhthu839_cc1", fullName: "Anh Thư", email: "anhthu@viettel.com.vn", mainUnit: "1789N2", subUnit: "1789N3-KĐG", status: "Hoạt động" },
+  { username: "vt_cskh_huyentrang915_cc2", fullName: "Huyền Trang", email: "huyentrang@viettel.com.vn", mainUnit: "1789N5", subUnit: "1789N6", status: "Hoạt động" },
+  { username: "vt_dvkh_vuminh123_cc3", fullName: "Vũ Minh", email: "vuminh@viettel.com.vn", mainUnit: "18008000N9", subUnit: "1789N1", status: "Hoạt động" },
+  { username: "vt_cskh_thuyduong544_cc1", fullName: "Thùy Dương", email: "thuyduong@viettel.com.vn", mainUnit: "18009000", subUnit: "VDS, SME", status: "Hoạt động" },
+  { username: "vt_dvkh_trunguong218_cc2", fullName: "Trung Ngượng", email: "trunguong@viettel.com.vn", mainUnit: "Di động", subUnit: "Di động", status: "Hoạt động" },
+  { username: "vt_cskh_hongnhung511_cc3", fullName: "Hồng Nhung", email: "hongnhung@viettel.com.vn", mainUnit: "Di động", subUnit: "Di động", status: "Hoạt động" },
+  { username: "vt_dvkh_khanhlinh472_cc1", fullName: "Khánh Linh", email: "khanhlinh@viettel.com.vn", mainUnit: "Cố định", subUnit: "18008000N2", status: "Hoạt động" },
+  { username: "vt_cskh_xuanmai804_cc2", fullName: "Xuân Mai", email: "xuanmai@viettel.com.vn", mainUnit: "SME", subUnit: "COC", status: "Hoạt động" },
+  { username: "vt_dvkh_phatdat607_cc3", fullName: "Phát Đạt", email: "phatdat@viettel.com.vn", mainUnit: "18008000N8", subUnit: "Di động, VDS", status: "Hoạt động" },
+];
+
 function getResultValue(header, row) {
   if (header === "Thời gian tiếp nhận") return "08/03/2025 20:00";
   const originalIndex = allResultHeaders.indexOf(header);
@@ -250,10 +344,23 @@ function Input({ value, onChange, placeholder = "", date = false }) {
   );
 }
 
-function App() {
+function App({ embedded = false }) {
   const [form, setForm] = useState(initialForm);
   const [advancedOpen, setAdvancedOpen] = useState(true);
+  const [selectedRows, setSelectedRows] = useState(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
   const [toast, setToast] = useState("");
+  const [controlStaffOpen, setControlStaffOpen] = useState(false);
+  const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
+  const [assignmentPrimaryQuota, setAssignmentPrimaryQuota] = useState("0");
+  const [assignmentSecondaryQuota, setAssignmentSecondaryQuota] = useState("0");
+  const [assignmentRows, setAssignmentRows] = useState([
+    { staffName: "", mainService: "", mainQty: "", subService: "", subQty: "0", subServices: [{ service: "", qty: "0" }] },
+  ]);
+  const [controlStaffMode, setControlStaffMode] = useState("list");
+  const [staffRows, setStaffRows] = useState(controlStaff.filter((staff) => staff.status === "Hoạt động"));
+  const [staffForm, setStaffForm] = useState({ username: "", mainUnit: "", subUnit: "", status: "", email: "" });
 
   const update = (key) => (event) => {
     setForm((current) => ({ ...current, [key]: event.target.value }));
@@ -271,6 +378,204 @@ function App() {
 
   const search = () => {
     setToast(`Đang tìm kiếm với ${searchSummary} điều kiện thay đổi`);
+    window.setTimeout(() => setToast(""), 2200);
+  };
+
+  const updateStaffForm = (key) => (event) => {
+    setStaffForm((current) => ({ ...current, [key]: event.target.value }));
+  };
+
+  const addControlStaff = (event) => {
+    event.preventDefault();
+    setStaffRows((current) => [...current, {
+      username: staffForm.username,
+      email: staffForm.email,
+      mainUnit: staffForm.mainUnit,
+      subUnit: staffForm.subUnit,
+      status: staffForm.status,
+    }]);
+    setStaffForm({ username: "", mainUnit: "", subUnit: "", status: "", email: "" });
+    setControlStaffMode("list");
+    setToast("Đã thêm nhân viên kiểm soát");
+    window.setTimeout(() => setToast(""), 2200);
+  };
+
+  const getSelectedServiceBreakdown = () => {
+    const selectedRecords = resultRows.filter((row) => selectedRows.has(row[1]));
+    const serviceCounts = selectedRecords.reduce((map, row) => {
+      const service = row[30] || "";
+      if (!service) return map;
+      map[service] = (map[service] || 0) + 1;
+      return map;
+    }, {});
+
+    return Object.entries(serviceCounts).map(([service, count]) => ({ service, count }));
+  };
+
+  const getStaffSecondaryServices = (staff) => {
+    if (!staff) return [];
+
+    const rawValues = Array.isArray(staff.subUnit)
+      ? staff.subUnit
+      : String(staff.subUnit || "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean);
+
+    const fallbackValues = controlStaffServiceOptions.sub.filter((service) => service !== staff.mainUnit);
+    const uniqueValues = [...new Set([
+      ...rawValues,
+      ...fallbackValues,
+    ].filter((value) => value && value !== staff.mainUnit).map((value) => value.trim()))];
+
+    return uniqueValues.slice(0, 3);
+  };
+
+  const getAssignmentServiceSummary = () => {
+    return getSelectedServiceBreakdown().map(({ service, count }) => {
+      const assignedCount = assignmentRows
+        .filter((row) => row.mainService === service && row.staffName)
+        .reduce((total, row) => total + Number(row.mainQty || 0), 0);
+
+      const remaining = Math.max(0, count - assignedCount);
+
+      return {
+        service,
+        count,
+        assignedCount,
+        remaining,
+      };
+    });
+  };
+
+  const totalAssignedWork = assignmentRows
+    .filter((row) => row.staffName && row.mainQty)
+    .reduce((total, row) => total + Number(row.mainQty || 0), 0);
+
+  const getSubServiceOptionsForStaff = (staff) => {
+    return getStaffSecondaryServices(staff);
+  };
+
+  const getAvailableSubServiceOptionsForRow = (row) => {
+    const selectedStaff = staffRows.find((staff) => staff.username === row.staffName);
+    const usedServices = new Set(
+      getRowSubServices(row)
+        .filter((item) => item.service)
+        .map((item) => item.service)
+    );
+
+    return getSubServiceOptionsForStaff(selectedStaff).filter((service) => !usedServices.has(service));
+  };
+
+  const distributeServiceCountAcrossSelectedStaff = (rows, serviceName) => {
+    const totalServiceCount = getSelectedServiceBreakdown().find((item) => item.service === serviceName)?.count || 0;
+    const selectedStaffNames = [...new Set(
+      rows
+        .filter((row) => row.staffName && row.mainService === serviceName)
+        .map((row) => row.staffName)
+    )];
+
+    if (!selectedStaffNames.length || totalServiceCount <= 0) {
+      return rows;
+    }
+
+    const base = Math.floor(totalServiceCount / selectedStaffNames.length);
+    const remainder = totalServiceCount % selectedStaffNames.length;
+    const distributionMap = new Map();
+
+    selectedStaffNames.forEach((staffName, index) => {
+      distributionMap.set(staffName, base + (index < remainder ? 1 : 0));
+    });
+
+    return rows.map((row) => {
+      if (!row.staffName || row.mainService !== serviceName) return row;
+      const assignedQty = distributionMap.get(row.staffName) ?? 0;
+      return {
+        ...row,
+        mainQty: String(assignedQty),
+        subQty: row.subService ? String(assignedQty) : "",
+      };
+    });
+  };
+
+  const getAvailableStaffOptionsForRow = (currentIndex) => {
+    const usedUsernames = new Set(
+      assignmentRows
+        .map((row, index) => (index !== currentIndex ? row.staffName : ""))
+        .filter(Boolean)
+    );
+
+    return staffRows.filter((staff) => staff.username === assignmentRows[currentIndex]?.staffName || !usedUsernames.has(staff.username));
+  };
+
+  const getRowSubServices = (row) => {
+    if (Array.isArray(row?.subServices) && row.subServices.length) {
+      return row.subServices;
+    }
+    if (row?.subService) {
+      return [{ service: row.subService, qty: row.subQty || "0" }];
+    }
+    return [{ service: "", qty: "0" }];
+  };
+
+  const buildAutoAssignmentRows = () => {
+    const selectedServiceBreakdown = getSelectedServiceBreakdown();
+    if (!selectedServiceBreakdown.length) {
+      return [{ staffName: "", mainService: "", mainQty: "", subService: "", subQty: "" }];
+    }
+
+    const rows = [];
+    const staffByMainService = staffRows.reduce((map, staff) => {
+      if (!map[staff.mainUnit]) map[staff.mainUnit] = [];
+      map[staff.mainUnit].push(staff);
+      return map;
+    }, {});
+
+    selectedServiceBreakdown.forEach(({ service, count }) => {
+      const matchingStaff = (staffByMainService[service] || []).filter(Boolean);
+      if (!matchingStaff.length) return;
+
+      const base = Math.floor(count / matchingStaff.length);
+      const remainder = count % matchingStaff.length;
+
+      matchingStaff.forEach((staff, index) => {
+        const assignedCount = base + (index < remainder ? 1 : 0);
+        if (assignedCount <= 0) return;
+
+        rows.push({
+          staffName: staff.username,
+          mainService: staff.mainUnit,
+          mainQty: String(assignedCount),
+          subService: Array.isArray(staff.subUnit) ? staff.subUnit[0] || "" : staff.subUnit || "",
+          subQty: Array.isArray(staff.subUnit) && staff.subUnit[0] ? String(assignedCount) : "0",
+          subServices: (Array.isArray(staff.subUnit) ? staff.subUnit : [staff.subUnit || ""]).filter(Boolean).slice(0, 3).map((service) => ({ service, qty: String(assignedCount) })),
+        });
+      });
+    });
+
+    return rows.length ? rows : [{ staffName: "", mainService: "", mainQty: "", subService: "", subQty: "" }];
+  };
+
+  const openAssignmentModal = () => {
+    if (!selectedRows.size) {
+      setToast("Vui lòng chọn ít nhất 1 bản ghi để phân chia công việc");
+      window.setTimeout(() => setToast(""), 2200);
+      return;
+    }
+    setAssignmentRows([{ staffName: "", mainService: "", mainQty: "", subService: "", subQty: "0", subServices: [{ service: "", qty: "0" }] }]);
+    setAssignmentModalOpen(true);
+  };
+
+  const resetAssignmentModal = () => {
+    setAssignmentPrimaryQuota("");
+    setAssignmentSecondaryQuota("");
+    setAssignmentRows([{ staffName: "", mainService: "", mainQty: "", subService: "", subQty: "0", subServices: [{ service: "", qty: "0" }] }]);
+  };
+
+  const deleteControlStaff = (username) => {
+    if (!window.confirm(`Bạn có chắc muốn xoá nhân viên ${username}?`)) return;
+    setStaffRows((current) => current.filter((staff) => staff.username !== username));
+    setToast("Đã xoá nhân viên kiểm soát");
     window.setTimeout(() => setToast(""), 2200);
   };
 
@@ -298,10 +603,60 @@ function App() {
     }, 1000);
   };
 
+  const downloadDetailedReports = () => {
+    const selectedResults = selectedRows.size
+      ? resultRows.filter((row) => selectedRows.has(row[1]))
+      : resultRows;
+    const headers = allResultHeaders;
+    const rows = selectedResults.map((row, index) => headers.map((header) => {
+      if (header === "STT") return index + 1;
+      return getResultValue(header, row);
+    }));
+    const csv = [headers, ...rows]
+      .map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(","))
+      .join("\n");
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" }));
+    link.download = `bao-cao-chi-tiet-${selectedResults.length}-ban-ghi.csv`;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    window.setTimeout(() => {
+      URL.revokeObjectURL(link.href);
+      link.remove();
+    }, 1000);
+    setToast(`Đã xuất báo cáo của ${selectedResults.length} bản ghi`);
+    window.setTimeout(() => setToast(""), 2200);
+  };
+
+  const toggleRow = (rowId) => {
+    setSelectedRows((current) => {
+      const next = new Set(current);
+      if (next.has(rowId)) next.delete(rowId);
+      else next.add(rowId);
+      return next;
+    });
+  };
+
+  const toggleAllRows = () => {
+    setSelectedRows((current) => current.size === resultRows.length
+      ? new Set()
+      : new Set(resultRows.map((row) => row[1])));
+  };
+
+  const totalPages = Math.ceil(resultRows.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentPageRows = resultRows.slice(startIndex, endIndex);
+
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${embedded ? "embedded-search-shell" : ""}`}>
+      {!embedded && <Sidebar
+        activeItem={controlStaffOpen ? "Quản Lý Nhân Viên Kiểm Soát" : "Hài Lòng"}
+        onManageControlStaff={() => setControlStaffOpen(true)}
+      />}
       <main className="main">
-        <header className="topbar">
+        {!controlStaffOpen && <header className="topbar">
           <div className="keyword-row">
             <Search size={18} />
             <input
@@ -335,8 +690,9 @@ function App() {
               </div>
             </div>
           </div>
-        </header>
+        </header>}
 
+        {!controlStaffOpen && <>
         <section className="content">
           <div className="filters">
             <div className="grid grid-4">
@@ -510,28 +866,42 @@ function App() {
 
           <div className="results-card">
             <div className="results-toolbar">
+              <button className="result-btn" onClick={() => setControlStaffOpen(true)}>
+                <Users size={14} />
+                Quản lý nhân viên kiểm soát
+              </button>
               <button className="result-btn">Bỏ qua</button>
               <button className="result-btn">Lịch sử chia việc</button>
-              <button className="result-btn">Phân chia công việc</button>
+              <button className="result-btn" onClick={openAssignmentModal} disabled={selectedRows.size === 0}>Phân chia công việc</button>
               <button className="result-btn">Cấu hình hiển thị</button>
-              <button className="result-btn" onClick={exportList}>Xuất file</button>
+              <button className="result-btn icon-only-btn" onClick={exportList} aria-label="Tải xuống" title="Tải xuống">
+                <Download size={14} />
+              </button>
+              <button
+                className="result-btn download-btn"
+                onClick={downloadDetailedReports}
+                title={selectedRows.size ? "Xuất báo cáo các bản ghi đã chọn" : "Xuất báo cáo toàn bộ bản ghi"}
+              >
+                <Download size={14} />
+                Xuất báo cáo
+              </button>
             </div>
 
             <div className="results-table-wrap">
               <table className="results-table">
                 <thead>
                   <tr>
-                    <th className="check-column"><input type="checkbox" aria-label="Chọn tất cả" /></th>
+                    <th className="check-column"><input type="checkbox" aria-label="Chọn tất cả" checked={resultRows.length > 0 && selectedRows.size === resultRows.length} onChange={toggleAllRows} /></th>
                     {resultHeaders.map((header) => (
                       <th key={header} title={header === viewActionColumn ? "" : header}>{header === viewActionColumn ? "" : header}{header && header !== "Hành động" && header !== viewActionColumn && <span className="sort-mark">↕</span>}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {resultRows.map((row, index) => (
+                  {currentPageRows.map((row, index) => (
                     <tr key={row[1]}>
-                      <td className="check-column"><input type="checkbox" aria-label={`Chọn dòng ${index + 1}`} /></td>
-                      <td>{index + 1}</td>
+                      <td className="check-column"><input type="checkbox" aria-label={`Chọn dòng ${startIndex + index + 1}`} checked={selectedRows.has(row[1])} onChange={() => toggleRow(row[1])} /></td>
+                      <td>{startIndex + index + 1}</td>
                       {resultHeaders.slice(1).map((header) => {
                         const displayValue = getResultValue(header, row);
                         return (
@@ -547,15 +917,24 @@ function App() {
             </div>
 
             <div className="results-footer">
-              <span>Bản ghi 1 - 1 của 1 bản ghi.</span>
+              <span>Bản ghi {Math.min(startIndex + 1, resultRows.length)} - {Math.min(endIndex, resultRows.length)} của {resultRows.length} bản ghi.</span>
               <div className="pagination">
-                <button aria-label="Trang đầu"><ChevronsLeft size={16} /></button>
-                <button aria-label="Trang trước">‹</button>
-                <button className="current">1</button>
-                <button>2</button>
-                <button>3</button>
-                <button aria-label="Trang sau">›</button>
-                <button aria-label="Trang cuối"><ChevronsRight size={16} /></button>
+                <button aria-label="Trang đầu" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}><ChevronsLeft size={16} /></button>
+                <button aria-label="Trang trước" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1}>‹</button>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, index) => {
+                  const pageNumber = Math.min(Math.max(1, currentPage - 2) + index, totalPages);
+                  return (
+                    <button
+                      key={pageNumber}
+                      className={pageNumber === currentPage ? "current" : ""}
+                      onClick={() => setCurrentPage(pageNumber)}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+                <button aria-label="Trang sau" onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} disabled={currentPage === totalPages}>›</button>
+                <button aria-label="Trang cuối" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}><ChevronsRight size={16} /></button>
               </div>
             </div>
           </div>
@@ -580,6 +959,275 @@ function App() {
             </table>
           </div>
         </section>
+        </>}
+
+        {controlStaffOpen && (
+          <section className="control-staff-screen" aria-labelledby="control-staff-title">
+            {controlStaffMode === "add" ? (
+              <form className="add-staff-screen" onSubmit={addControlStaff}>
+                <h1 id="control-staff-title">Thêm nhân viên kiểm soát</h1>
+                <div className="staff-form-grid">
+                  <label><span>Nhân Viên Kiểm Soát <b>*</b></span><input value={staffForm.username} onChange={updateStaffForm("username")} required /></label>
+                  <label><span>Dịch Vụ Chính <b>*</b></span><select value={staffForm.mainUnit} onChange={updateStaffForm("mainUnit")} required><option value="">Chọn dịch vụ</option>{controlStaffServiceOptions.main.map((service) => <option key={service}>{service}</option>)}</select></label>
+                  <label><span>Dịch Vụ Phụ</span><select value={staffForm.subUnit} onChange={updateStaffForm("subUnit")}><option value="">Chọn dịch vụ phụ</option>{controlStaffServiceOptions.sub.map((service) => <option key={service}>{service}</option>)}</select></label>
+                  <label><span>Trạng Thái <b>*</b></span><select value={staffForm.status} onChange={updateStaffForm("status")} required><option value="">Chọn trạng thái</option><option>Hoạt Động</option><option>Không Hoạt Động</option></select></label>
+                  <label><span>Email</span><input type="email" value={staffForm.email} onChange={updateStaffForm("email")} /></label>
+                </div>
+                <div className="add-staff-actions">
+                  <button type="button" className="secondary-btn" onClick={() => setControlStaffMode("list")}>Hủy</button>
+                  <button type="submit" className="primary-btn">Lưu nhân viên</button>
+                </div>
+              </form>
+            ) : (
+            <>
+            <h1 id="control-staff-title">Danh sách nhân viên kiểm soát</h1>
+            <div className="control-staff-actions">
+              <input className="staff-search" placeholder="Tìm kiếm nhân viên theo từ khoá hoặc user account" />
+              <button className="staff-add-btn" onClick={() => setControlStaffMode("add")}>
+                <Plus size={17} />
+                Thêm nhân viên
+              </button>
+            </div>
+            <div className="control-staff-screen-card">
+              <table className="control-staff-table">
+                <thead>
+                  <tr>
+                    <th>User account</th>
+                    <th>Email</th>
+                    <th>DV chính</th>
+                    <th>DV phụ</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {staffRows.map((staff) => (
+                    <tr key={staff.username}>
+                      <td>{staff.username}</td>
+                      <td>{staff.email}</td>
+                      <td>{staff.mainUnit}</td>
+                      <td>{staff.subUnit}</td>
+                      <td><span className="staff-status active">{staff.status}</span></td>
+                      <td className="staff-actions-cell">
+                        <button className="staff-action" onClick={() => setToast(`Chỉnh sửa ${staff.username}`)}>Chỉnh sửa</button>
+                        <button className="staff-delete-action" onClick={() => deleteControlStaff(staff.username)}>Xoá</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            </>
+            )}
+          </section>
+        )}
+
+        {assignmentModalOpen && (
+          <div className="assignment-modal-backdrop" onClick={() => setAssignmentModalOpen(false)}>
+            <div className="assignment-modal" onClick={(event) => event.stopPropagation()}>
+              <div className="assignment-header">
+                <h2>PHÂN CHIA CÔNG VIỆC</h2>
+                <button type="button" className="modal-close" aria-label="Đóng" onClick={() => setAssignmentModalOpen(false)}>
+                  <X size={21} />
+                </button>
+              </div>
+
+              <div className="assignment-body">
+                <div className="assignment-top-controls">
+                  <label className="assignment-field">
+                    <span>Số lượng cho mỗi nhân viên (chính)</span>
+                    <input value={assignmentPrimaryQuota} onChange={(event) => setAssignmentPrimaryQuota(event.target.value)} />
+                  </label>
+                  <label className="assignment-field">
+                    <span>Số lượng cho mỗi nhân viên (phụ)</span>
+                    <input value={assignmentSecondaryQuota} onChange={(event) => setAssignmentSecondaryQuota(event.target.value)} />
+                  </label>
+                  <button type="button" className="assignment-apply-btn">Áp dụng</button>
+                </div>
+
+                <div className="assignment-grid">
+                  <div className="assignment-row assignment-row-header">
+                    <div className="assignment-label">Nhân Viên Kiểm Soát <span className="required-star">*</span></div>
+                    <div className="assignment-label">Dịch Vụ Chính <span className="required-star">*</span></div>
+                    <div className="assignment-label">Số Lượng Chính <span className="required-star">*</span></div>
+                    <div className="assignment-label">Dịch Vụ Phụ &amp; Số Lượng</div>
+                  </div>
+
+                  {assignmentRows.map((row, index) => (
+                    <div className="assignment-row" key={`assignment-row-${index}`}>
+                      <div className="assignment-cell select-cell">
+                        <select value={row.staffName} onChange={(event) => {
+                          const nextStaffName = event.target.value;
+                          const alreadyUsed = assignmentRows.some((item, itemIndex) => itemIndex !== index && item.staffName === nextStaffName);
+
+                          if (nextStaffName && alreadyUsed) {
+                            setToast("Nhân viên này đã được chọn ở dòng khác");
+                            window.setTimeout(() => setToast(""), 2200);
+                            return;
+                          }
+
+                          const selectedStaff = staffRows.find((staff) => staff.username === nextStaffName);
+                          const nextMainService = selectedStaff?.mainUnit || "";
+                          const secondaryOptions = getSubServiceOptionsForStaff(selectedStaff);
+
+                          setAssignmentRows((current) => {
+                            const updatedRows = current.map((item, itemIndex) => itemIndex === index ? {
+                              ...item,
+                              staffName: nextStaffName,
+                              mainService: nextMainService,
+                              subService: "",
+                              mainQty: "",
+                              subQty: "0",
+                              subServices: [{ service: "", qty: "0" }],
+                            } : item);
+
+                            const allServices = [...new Set(updatedRows.filter((item) => item.mainService).map((item) => item.mainService))];
+                            let distributedRows = updatedRows;
+                            allServices.forEach((serviceName) => {
+                              distributedRows = distributeServiceCountAcrossSelectedStaff(distributedRows, serviceName);
+                            });
+
+                            return distributedRows;
+                          });
+                        }}>
+                          <option value="">-- Chọn nhân viên --</option>
+                          {getAvailableStaffOptionsForRow(index).map((staff) => (
+                            <option key={staff.username} value={staff.username}>
+                              {staff.username}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="assignment-cell select-cell assignment-locked-select">
+                        <select value={row.mainService} disabled>
+                          <option value="">-- Chọn dịch vụ --</option>
+                          {row.mainService ? (
+                            <option value={row.mainService}>{row.mainService}</option>
+                          ) : null}
+                        </select>
+                      </div>
+                      <div className="assignment-cell input-cell">
+                        <input value={row.mainQty} onChange={(event) => setAssignmentRows((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, mainQty: event.target.value } : item))} placeholder="Nhập số" />
+                      </div>
+                      <div className="assignment-cell select-cell">
+                        <div className="assignment-subservice-stack">
+                          {getRowSubServices(row).map((subItem, subIndex) => (
+                            <div key={`subservice-${index}-${subIndex}`} className="assignment-subservice-row">
+                              <div className="assignment-subservice-select-wrap">
+                                <select
+                                  value={subItem.service}
+                                  onChange={(event) => {
+                                    const nextValue = event.target.value;
+                                    setAssignmentRows((current) => current.map((item, itemIndex) => itemIndex === index ? {
+                                      ...item,
+                                      subService: nextValue,
+                                      subQty: nextValue ? String(item.mainQty || 0) : "0",
+                                      subServices: getRowSubServices(item).map((entry, entryIndex) => entryIndex === subIndex ? { ...entry, service: nextValue, qty: nextValue ? String(item.mainQty || 0) : "0" } : entry),
+                                    } : item));
+                                  }}
+                                  disabled={!row.staffName || !getSubServiceOptionsForStaff(staffRows.find((staff) => staff.username === row.staffName)).length}
+                                >
+                                  <option value="">-- Chọn dịch vụ --</option>
+                                  {getSubServiceOptionsForStaff(staffRows.find((staff) => staff.username === row.staffName)).map((service) => (
+                                    <option key={service} value={service} disabled={getRowSubServices(row).some((entry, entryIndex) => entryIndex !== subIndex && entry.service === service)}>
+                                      {service}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="assignment-subservice-qty-wrap">
+                                <span className="assignment-subservice-label">SL</span>
+                                <input
+                                  value={subItem.qty}
+                                  onChange={(event) => setAssignmentRows((current) => current.map((item, itemIndex) => itemIndex === index ? {
+                                    ...item,
+                                    subQty: event.target.value,
+                                    subServices: getRowSubServices(item).map((entry, entryIndex) => entryIndex === subIndex ? { ...entry, qty: event.target.value } : entry),
+                                  } : item))}
+                                  placeholder="Số"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            className="assignment-add-subservice"
+                            disabled={!row.staffName || !getAvailableSubServiceOptionsForRow(row).length}
+                            onClick={() => setAssignmentRows((current) => current.map((item, itemIndex) => itemIndex === index ? {
+                              ...item,
+                              subServices: [...getRowSubServices(item), { service: "", qty: "0" }],
+                              subService: getRowSubServices(item)[0]?.service || "",
+                              subQty: getRowSubServices(item)[0]?.qty || "0",
+                            } : item))}
+                            aria-label="Thêm dịch vụ phụ"
+                            title="Thêm dịch vụ phụ"
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="assignment-add-row"
+                    onClick={() => setAssignmentRows((current) => [...current, { staffName: "", mainService: "", mainQty: "", subService: "", subQty: "" }])}
+                    aria-label="Thêm hàng"
+                  >
+                    <Plus size={22} />
+                  </button>
+                </div>
+
+                <div className="assignment-summary">
+                  <div className="assignment-summary-box">
+                    <label>Tổng số việc cần phân chia</label>
+                    <input value={selectedRows.size} readOnly />
+                  </div>
+                  <div className="assignment-summary-box">
+                    <label>Tổng số việc được giao</label>
+                    <input value={totalAssignedWork} readOnly />
+                  </div>
+                </div>
+
+                <div className="assignment-table-section">
+                  <h3>Thông kê theo dịch vụ</h3>
+                  <table className="assignment-table">
+                    <thead>
+                      <tr>
+                        <th>Dịch vụ</th>
+                        <th>Cần phân chia</th>
+                        <th>Đã giao</th>
+                        <th>Thừa / Thiếu</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {getAssignmentServiceSummary().map(({ service, count, assignedCount, remaining }) => (
+                        <tr key={service}>
+                          <td>{service}</td>
+                          <td>{count}</td>
+                          <td>{assignedCount}</td>
+                          <td className={remaining > 0 ? "diff-negative" : "diff-zero"}>{remaining}</td>
+                        </tr>
+                      ))}
+                      {!getAssignmentServiceSummary().length && (
+                        <tr>
+                          <td colSpan="4">Chưa có dịch vụ nào được chọn</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="assignment-actions">
+                  <button type="button" className="secondary-btn" onClick={() => setAssignmentModalOpen(false)}>Hủy</button>
+                  <button type="button" className="secondary-btn" onClick={resetAssignmentModal}>Đặt lại</button>
+                  <button type="button" className="primary-btn" onClick={() => { setToast("Đã phân chia công việc"); setAssignmentModalOpen(false); window.setTimeout(() => setToast(""), 2200); }}>Phân chia</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {toast && (
           <div className="toast">

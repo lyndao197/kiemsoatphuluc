@@ -7,10 +7,11 @@ const menuItems = [
   "Phản Ánh Nhiều Lần",
   "Phản Ánh Lặp",
   "Kiểm Soát Theo Chủ Đề",
+  "Quản Lý Nhân Viên Kiểm Soát",
   "Cấu Hình Loại Báo Cáo",
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onManageControlStaff, onMyWork, onSatisfaction, activeItem }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
@@ -23,7 +24,8 @@ export default function Sidebar() {
         {menuItems.map((item) => (
           <button
             key={item}
-            className={`nav-item ${item === "Hài Lòng" ? "active" : ""}`}
+            className={`nav-item ${item === activeItem ? "active" : ""}`}
+            onClick={item === "Quản Lý Nhân Viên Kiểm Soát" ? onManageControlStaff : item === "Công Việc Của Tôi" ? onMyWork : item === "Hài Lòng" ? onSatisfaction : undefined}
           >
             {item}
           </button>

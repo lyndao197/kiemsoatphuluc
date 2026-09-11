@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./searchui";
+import App from "./UserList";
 import "./styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
