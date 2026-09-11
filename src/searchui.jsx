@@ -9,6 +9,7 @@ import {
   Eye,
   Globe2,
   Maximize2,
+  Minus,
   Plus,
   Search,
   Settings,
@@ -502,10 +503,28 @@ function App({ embedded = false }) {
     return rows.map((row) => {
       if (!row.staffName || row.mainService !== serviceName) return row;
       const assignedQty = distributionMap.get(row.staffName) ?? 0;
+      const subServices = getRowSubServices(row);
+      const balancedSubServices = subServices.map((item) => {
+        if (!item.service) return item;
+
+        const sameServiceEntries = subServices.filter((entry) => entry.service === item.service);
+        if (sameServiceEntries.length <= 1) {
+          return { ...item, qty: String(assignedQty) };
+        }
+
+        const baseQty = Math.floor(assignedQty / sameServiceEntries.length);
+        const remainderQty = assignedQty % sameServiceEntries.length;
+        const matchingIndex = sameServiceEntries.findIndex((entry) => entry === item);
+        const distributedQty = baseQty + (matchingIndex < remainderQty ? 1 : 0);
+
+        return { ...item, qty: String(distributedQty) };
+      });
+
       return {
         ...row,
         mainQty: String(assignedQty),
         subQty: row.subService ? String(assignedQty) : "",
+        subServices: balancedSubServices.length ? balancedSubServices : [{ service: row.subService || "", qty: row.subService ? String(assignedQty) : "0" }].filter((item) => item.service),
       };
     });
   };
@@ -556,6 +575,50 @@ function App({ embedded = false }) {
     });
 
     return rows.length ? rows : [{ staffName: "", mainService: "", mainQty: "", subService: "", subQty: "" }];
+  };
+
+  const autoDistributeAssignmentRows = () => {
+    const nonEmptyRows = assignmentRows.filter((row) => row.staffName && row.mainService);
+    if (!nonEmptyRows.length) {
+      setToast("Vui lòng chọn ít nhất 1 nhân viên để chia việc tự động");
+      window.setTimeout(() => setToast(""), 2200);
+      return;
+    }
+
+    let updatedRows = assignmentRows.map((row) => {
+      const selectedStaff = staffRows.find((staff) => staff.username === row.staffName);
+      const selectedSubServices = getRowSubServices(row).filter((item) => item.service);
+      const selectedSecondaryServices = selectedSubServices.length ? selectedSubServices : [{ service: selectedStaff?.subUnit || "", qty: "0" }].filter((item) => item.service);
+
+      return {
+        ...row,
+        subServices: selectedSecondaryServices.length ? selectedSecondaryServices.map((item, index) => ({
+          service: item.service,
+          qty: item.qty && Number(item.qty) > 0 ? String(item.qty) : index === 0 ? String(row.mainQty || 0) : "0",
+        })) : [{ service: "", qty: "0" }],
+      };
+    });
+
+    const allServices = [...new Set(updatedRows.filter((row) => row.mainService).map((row) => row.mainService))];
+
+    allServices.forEach((serviceName) => {
+      updatedRows = distributeServiceCountAcrossSelectedStaff(updatedRows, serviceName);
+    });
+
+    updatedRows = updatedRows.map((row) => {
+      const selectedStaff = staffRows.find((staff) => staff.username === row.staffName);
+      const secondaryOptions = getSubServiceOptionsForStaff(selectedStaff);
+      const subServices = getRowSubServices(row).filter((item) => item.service && secondaryOptions.includes(item.service));
+
+      return {
+        ...row,
+        subServices: subServices.length ? subServices : [{ service: "", qty: "0" }],
+        subService: subServices[0]?.service || "",
+        subQty: subServices[0]?.qty || "0",
+      };
+    });
+
+    setAssignmentRows(updatedRows);
   };
 
   const openAssignmentModal = () => {
@@ -1036,15 +1099,10 @@ function App({ embedded = false }) {
 
               <div className="assignment-body">
                 <div className="assignment-top-controls">
-                  <label className="assignment-field">
-                    <span>Số lượng cho mỗi nhân viên (chính)</span>
-                    <input value={assignmentPrimaryQuota} onChange={(event) => setAssignmentPrimaryQuota(event.target.value)} />
-                  </label>
-                  <label className="assignment-field">
-                    <span>Số lượng cho mỗi nhân viên (phụ)</span>
-                    <input value={assignmentSecondaryQuota} onChange={(event) => setAssignmentSecondaryQuota(event.target.value)} />
-                  </label>
-                  <button type="button" className="assignment-apply-btn">Áp dụng</button>
+                  <div />
+                  <div />
+                  <div />
+                  <button type="button" className="assignment-apply-btn" onClick={autoDistributeAssignmentRows}>Chia việc tự động</button>
                 </div>
 
                 <div className="assignment-grid">
@@ -1057,7 +1115,16 @@ function App({ embedded = false }) {
 
                   {assignmentRows.map((row, index) => (
                     <div className="assignment-row" key={`assignment-row-${index}`}>
-                      <div className="assignment-cell select-cell">
+                      <div className="assignment-cell select-cell assignment-row-with-remove">
+                        <button
+                          type="button"
+                          className="assignment-remove-row"
+                          aria-label="Xoá nhân viên khỏi phân chia"
+                          title="Xoá nhân viên khỏi phân chia"
+                          onClick={() => setAssignmentRows((current) => current.filter((_, itemIndex) => itemIndex !== index))}
+                        >
+                          <Minus size={16} />
+                        </button>
                         <select value={row.staffName} onChange={(event) => {
                           const nextStaffName = event.target.value;
                           const alreadyUsed = assignmentRows.some((item, itemIndex) => itemIndex !== index && item.staffName === nextStaffName);
@@ -1072,25 +1139,15 @@ function App({ embedded = false }) {
                           const nextMainService = selectedStaff?.mainUnit || "";
                           const secondaryOptions = getSubServiceOptionsForStaff(selectedStaff);
 
-                          setAssignmentRows((current) => {
-                            const updatedRows = current.map((item, itemIndex) => itemIndex === index ? {
-                              ...item,
-                              staffName: nextStaffName,
-                              mainService: nextMainService,
-                              subService: "",
-                              mainQty: "",
-                              subQty: "0",
-                              subServices: [{ service: "", qty: "0" }],
-                            } : item);
-
-                            const allServices = [...new Set(updatedRows.filter((item) => item.mainService).map((item) => item.mainService))];
-                            let distributedRows = updatedRows;
-                            allServices.forEach((serviceName) => {
-                              distributedRows = distributeServiceCountAcrossSelectedStaff(distributedRows, serviceName);
-                            });
-
-                            return distributedRows;
-                          });
+                          setAssignmentRows((current) => current.map((item, itemIndex) => itemIndex === index ? {
+                            ...item,
+                            staffName: nextStaffName,
+                            mainService: nextMainService,
+                            subService: "",
+                            mainQty: "",
+                            subQty: "0",
+                            subServices: [{ service: "", qty: "0" }],
+                          } : item));
                         }}>
                           <option value="">-- Chọn nhân viên --</option>
                           {getAvailableStaffOptionsForRow(index).map((staff) => (
@@ -1149,18 +1206,35 @@ function App({ embedded = false }) {
                                   placeholder="Số"
                                 />
                               </div>
+                              <button
+                                type="button"
+                                className="assignment-remove-subservice"
+                                aria-label="Xoá dịch vụ phụ"
+                                title="Xoá dịch vụ phụ"
+                                onClick={() => setAssignmentRows((current) => current.map((item, itemIndex) => itemIndex === index ? {
+                                  ...item,
+                                  subServices: getRowSubServices(item).filter((_, entryIndex) => entryIndex !== subIndex),
+                                  subService: getRowSubServices(item).filter((_, entryIndex) => entryIndex !== subIndex)[0]?.service || "",
+                                  subQty: getRowSubServices(item).filter((_, entryIndex) => entryIndex !== subIndex)[0]?.qty || "0",
+                                } : item))}
+                              >
+                                <Trash2 size={14} />
+                              </button>
                             </div>
                           ))}
                           <button
                             type="button"
                             className="assignment-add-subservice"
                             disabled={!row.staffName || !getAvailableSubServiceOptionsForRow(row).length}
-                            onClick={() => setAssignmentRows((current) => current.map((item, itemIndex) => itemIndex === index ? {
-                              ...item,
-                              subServices: [...getRowSubServices(item), { service: "", qty: "0" }],
-                              subService: getRowSubServices(item)[0]?.service || "",
-                              subQty: getRowSubServices(item)[0]?.qty || "0",
-                            } : item))}
+                            onClick={() => {
+                              if (!row.staffName || !getAvailableSubServiceOptionsForRow(row).length) return;
+                              setAssignmentRows((current) => current.map((item, itemIndex) => itemIndex === index ? {
+                                ...item,
+                                subServices: [...getRowSubServices(item), { service: "", qty: "0" }],
+                                subService: getRowSubServices(item)[0]?.service || "",
+                                subQty: getRowSubServices(item)[0]?.qty || "0",
+                              } : item));
+                            }}
                             aria-label="Thêm dịch vụ phụ"
                             title="Thêm dịch vụ phụ"
                           >

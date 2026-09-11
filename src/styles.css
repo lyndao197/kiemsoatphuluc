@@ -1121,7 +1121,7 @@ button {
 
 .assignment-top-controls {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(240px, 1fr) 180px;
+  grid-template-columns: minmax(240px, 1fr) minmax(240px, 1fr) minmax(120px, 180px) minmax(120px, 170px);
   align-items: end;
   gap: 20px;
   padding: 0 8px 12px;
@@ -1159,8 +1159,11 @@ button {
   border-radius: 6px;
   background: #2f4357;
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
+  width: 100%;
+  max-width: 150px;
+  justify-self: end;
 }
 
 .assignment-grid {
@@ -1250,17 +1253,80 @@ button {
   white-space: nowrap;
 }
 
-.assignment-add-row {
-  width: 36px;
-  height: 36px;
-  margin-top: 8px;
+.assignment-row-with-remove {
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.assignment-remove-row {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  border: 0;
-  border-radius: 50%;
-  background: #dfeaf3;
+  border: 1px solid #d7dee5;
+  border-radius: 6px;
+  background: #fff;
+  color: #d93025;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.assignment-remove-row:hover {
+  background: #fff3f3;
+}
+
+.assignment-remove-subservice {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d7dee5;
+  border-radius: 6px;
+  background: #fff;
+  color: #d93025;
+  cursor: pointer;
+}
+
+.assignment-remove-subservice:hover {
+  background: #fff3f3;
+}
+
+.assignment-add-row {
+  width: 28px;
+  height: 28px;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d7dee5;
+  border-radius: 6px;
+  background: #fff;
   color: #2b4e68;
+  cursor: pointer;
+}
+
+.assignment-add-row:hover {
+  background: #eef6ff;
+}
+
+.assignment-add-subservice {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d7dee5;
+  border-radius: 6px;
+  background: #fff;
+  color: #2b4e68;
+  cursor: pointer;
+}
+
+.assignment-add-subservice:hover {
+  background: #eef6ff;
 }
 
 .assignment-summary {
