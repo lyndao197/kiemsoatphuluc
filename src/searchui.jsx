@@ -448,9 +448,21 @@ function App({ embedded = false }) {
     });
   };
 
-  const totalAssignedWork = assignmentRows
-    .filter((row) => row.staffName && row.mainQty)
-    .reduce((total, row) => total + Number(row.mainQty || 0), 0);
+  const getRowSubServices = (row) => {
+    if (Array.isArray(row?.subServices) && row.subServices.length) {
+      return row.subServices;
+    }
+    if (row?.subService) {
+      return [{ service: row.subService, qty: row.subQty || "0" }];
+    }
+    return [{ service: "", qty: "0" }];
+  };
+
+  const totalAssignedWork = assignmentRows.reduce((total, row) => {
+    const mainQty = Number(row.mainQty || 0);
+    const subQty = getRowSubServices(row).reduce((sum, item) => sum + Number(item.qty || 0), 0);
+    return total + mainQty + subQty;
+  }, 0);
 
   const getSubServiceOptionsForStaff = (staff) => {
     return getStaffSecondaryServices(staff);
@@ -506,16 +518,6 @@ function App({ embedded = false }) {
     );
 
     return staffRows.filter((staff) => staff.username === assignmentRows[currentIndex]?.staffName || !usedUsernames.has(staff.username));
-  };
-
-  const getRowSubServices = (row) => {
-    if (Array.isArray(row?.subServices) && row.subServices.length) {
-      return row.subServices;
-    }
-    if (row?.subService) {
-      return [{ service: row.subService, qty: row.subQty || "0" }];
-    }
-    return [{ service: "", qty: "0" }];
   };
 
   const buildAutoAssignmentRows = () => {
